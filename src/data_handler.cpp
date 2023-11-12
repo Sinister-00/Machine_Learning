@@ -19,7 +19,7 @@ void data_handler::read_feature_vector(std::string path)
 {
     uint32_t header[4]; // Magic number, number of images, number of rows, number of columns
     unsigned char bytes[4];
-    FILE *fp = fopen(path.c_str(), "r");
+    FILE *fp = fopen(path.c_str(), "rb");
     if (fp == NULL)
     {
         std::cout << "Error opening file: " << path << std::endl;
@@ -38,7 +38,7 @@ void data_handler::read_feature_vector(std::string path)
         }
         std::cout << "Done getting input fle header header" << std::endl;
         int img_size = header[2] * header[3];
-        for (int i = 0; i < header[1]; i++)
+        for (uint32_t i = 0; i < header[1]; i++)
         {
             data *d = new data();
             uint8_t elem[1];
@@ -63,7 +63,7 @@ void data_handler::read_label_vector(std::string path)
 {
     uint32_t header[2]; // Magic number, number of images
     unsigned char bytes[2];
-    FILE *fp = fopen(path.c_str(), "r");
+    FILE *fp = fopen(path.c_str(), "rb");
     if (fp == NULL)
     {
         std::cout << "Error opening file: " << path << std::endl;
@@ -82,7 +82,7 @@ void data_handler::read_label_vector(std::string path)
         }
         std::cout << "Done getting label file header" << std::endl;
         // int img_size = header[2] * header[3];
-        for (int i = 0; i < header[1]; i++)
+        for (uint32_t i = 0; i < header[1]; i++)
         {
             uint8_t elem[1];
             if (fread(elem, sizeof(elem), 1, fp))
@@ -165,7 +165,8 @@ void data_handler::count_classes()
 uint32_t data_handler::convert_to_little_endian(const unsigned char *bytes)
 {
     // from stack overflow
-    
+
+    return (uint32_t)((bytes[0] << 24) | (bytes[1] << 16) | (bytes[2] << 8) | (bytes[3]));
 }
 std::vector<data *> *data_handler::get_train_data()
 {
@@ -178,4 +179,16 @@ std::vector<data *> *data_handler::get_test_data()
 std::vector<data *> *data_handler::get_validation_data()
 {
     return validation_data;
+}
+
+// testing that the data handler works
+int main()
+{
+    data_handler *dh = new data_handler();
+    dh->read_feature_vector("Dataset/train-labels-idx1-ubyte");
+    dh->read_label_vector("Dataset/train-labels-idx1-ubyte");
+    dh->split_data();
+    dh->count_classes();
+    std::cout << "Done\n";
+    return 0;
 }

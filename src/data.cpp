@@ -41,4 +41,5 @@ data::data()
 }
 data::~data()
 {
+    delete feature_vector;
 }
