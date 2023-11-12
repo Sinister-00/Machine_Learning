@@ -5,13 +5,15 @@
 #include <iostream>
 #include <stdint.h>
 
-class Data
+class data
 {
     std::vector<uint8_t> *feature_vector; // Feature vector without a class label at the end.
     uint8_t label;                        // Class label
     int enum_label;                       // Enumerated label (A->1, B->2, ...)
 
 public:
+    data();
+    ~data();
     // Setter methods
     void set_feature_vector(std::vector<uint8_t> *); // Set the feature vector
     void append_feature_vector(uint8_t);             // Append a value to the feature vector

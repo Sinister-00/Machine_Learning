@@ -10,11 +10,11 @@
 
 class data_handler
 {
-    // Data arrays to store different sets
-    std::vector<Data *> *data_array;      // All data before splitting
-    std::vector<Data *> *train_data;      // Training data set
-    std::vector<Data *> *test_data;       // Testing data set
-    std::vector<Data *> *validation_data; // Validation data set
+    // data arrays to store different sets
+    std::vector<data *> *data_array;      // All data before splitting
+    std::vector<data *> *train_data;      // Training data set
+    std::vector<data *> *test_data;       // Testing data set
+    std::vector<data *> *validation_data; // Validation data set
 
     int num_classes;                  // Number of unique classes in the data
     int feature_vector_size;          // Size of the feature vector
@@ -39,9 +39,9 @@ public:
     uint32_t convert_to_little_endian(const unsigned char *bytes); // Convert number to little endian
 
     // Getter functions for different data sets
-    std::vector<Data *> *get_train_data();
-    std::vector<Data *> *get_test_data();
-    std::vector<Data *> *get_validation_data();
+    std::vector<data *> *get_train_data();
+    std::vector<data *> *get_test_data();
+    std::vector<data *> *get_validation_data();
 };
 
 #endif // __DATA_HANDLER_H__
