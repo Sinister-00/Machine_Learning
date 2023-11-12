@@ -1,6 +1,12 @@
 #ifndef __KNN_H__
 #define __KNN_H__
 #include <vector>
+#include <limits>
+#include <math.h>
+#include <cmath>
+#include <map>
+#include <iostream>
+#include "data_handler.hpp"
 #include <data.hpp>
 
 class knn

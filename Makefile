@@ -31,3 +31,11 @@ clean:
 	rm -r lib
 	rm -r obj
 
+
+# in case of error:
+
+# g++ -c -fPIC -std=c++11 -I./include -o obj/data_handler.o ./src/data_handler.cpp
+
+# g++ -c -fPIC -std=c++11 -I./include -o obj/data.o ./src/data.cpp        
+
+# g++ -shared -o libdata.so obj/data_handler.o obj/data.o -fPIC

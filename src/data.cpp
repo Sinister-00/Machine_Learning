@@ -43,3 +43,8 @@ data::~data()
 {
     delete feature_vector;
 }
+
+void data::set_distance(double val)
+{
+    distance = val; 
+}
