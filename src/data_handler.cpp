@@ -100,20 +100,82 @@ void data_handler::read_label_vector(std::string path)
 }
 void data_handler::split_data()
 {
+    std::unordered_set<int> used_idxs;
+    int train_size = data_array->size() * TRAIN_SET_PERCENTAGE;
+    int test_size = data_array->size() * TEST_SET_PERCENTAGE;
+    int validation_size = data_array->size() * VALIDATION_SET_PERCENTAGE;
+
+    // training
+    int count = 0;
+    while (count < train_size)
+    {
+        int idx = rand() % data_array->size(); // index between 0 and data_array->size()-1
+        if (used_idxs.find(idx) == used_idxs.end())
+        {
+            train_data->push_back(data_array->at(idx));
+            used_idxs.insert(idx);
+            count++;
+        }
+    }
+    // test
+    count = 0;
+    while (count < test_size)
+    {
+        int idx = rand() % data_array->size(); // index between 0 and data_array->size()-1
+        if (used_idxs.find(idx) == used_idxs.end())
+        {
+            test_data->push_back(data_array->at(idx));
+            used_idxs.insert(idx);
+            count++;
+        }
+    }
+    // validation
+    count = 0;
+    while (count < validation_size)
+    {
+        int idx = rand() % data_array->size(); // index between 0 and data_array->size()-1
+        if (used_idxs.find(idx) == used_idxs.end())
+        {
+            validation_data->push_back(data_array->at(idx));
+            used_idxs.insert(idx);
+            count++;
+        }
+    }
+    std::cout << "Successfully split data into training, test, and validation sets\n";
+    std::cout << "Training set size: " << train_data->size() << std::endl;
+    std::cout << "Test set size: " << test_data->size() << std::endl;
+    std::cout << "Validation set size: " << validation_data->size() << std::endl;
 }
 void data_handler::count_classes()
 {
+    int count = 0;
+    for (unsigned int i = 0; i < data_array->size(); i++)
+    {
+        if (class_map.find(data_array->at(i)->get_label()) == class_map.end())
+        {
+            class_map[data_array->at(i)->get_label()] = count;
+            data_array->at(i)->set_enum_label(count);
+            count++;
+        }
+    }
+    num_classes = count;
+    std::cout << "Successfully counted number of classes: " << num_classes << std::endl;
 }
 
 uint32_t data_handler::convert_to_little_endian(const unsigned char *bytes)
 {
+    // from stack overflow
+    
 }
 std::vector<data *> *data_handler::get_train_data()
 {
+    return train_data;
 }
 std::vector<data *> *data_handler::get_test_data()
 {
+    return test_data;
 }
 std::vector<data *> *data_handler::get_validation_data()
 {
+    return validation_data;
 }
