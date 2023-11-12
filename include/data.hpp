@@ -14,6 +14,7 @@ class Data
 public:
     // Setter methods
     void set_feature_vector(std::vector<uint8_t> *); // Set the feature vector
+    void append_feature_vector(uint8_t);             // Append a value to the feature vector
     void set_label(uint8_t);                         // Set the class label
     void set_enum_label(int);                        // Set the enumerated label
 
