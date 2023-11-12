@@ -20,7 +20,7 @@ class data_handler
     int feature_vector_size;          // Size of the feature vector
     std::map<uint8_t, int> class_map; // Map class label to enum value
 
-    const double TRAIN_SET_PERCENTAGE = 0.5;
+    const double TRAIN_SET_PERCENTAGE = 0.75;
     const double TEST_SET_PERCENTAGE = 0.20;
     const double VALIDATION_SET_PERCENTAGE = 0.05;
 

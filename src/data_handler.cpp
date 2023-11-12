@@ -62,7 +62,7 @@ void data_handler::read_feature_vector(std::string path)
 void data_handler::read_label_vector(std::string path)
 {
     uint32_t header[2]; // Magic number, number of images
-    unsigned char bytes[2];
+    unsigned char bytes[4];
     FILE *fp = fopen(path.c_str(), "rb");
     if (fp == NULL)
     {
@@ -82,6 +82,7 @@ void data_handler::read_label_vector(std::string path)
         }
         std::cout << "Done getting label file header" << std::endl;
         // int img_size = header[2] * header[3];
+        // std::cout << header[1] << std::endl;
         for (uint32_t i = 0; i < std::min(header[1], static_cast<uint32_t>(data_array->size())); i++)
         {
             uint8_t elem[1];
