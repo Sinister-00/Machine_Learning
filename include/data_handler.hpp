@@ -39,6 +39,7 @@ public:
     uint32_t convert_to_little_endian(const unsigned char *bytes); // Convert number to little endian
 
     // Getter functions for different data sets
+    int get_num_classes();
     std::vector<data *> *get_train_data();
     std::vector<data *> *get_test_data();
     std::vector<data *> *get_validation_data();
