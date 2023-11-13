@@ -1,4 +1,5 @@
 #include "../include/kmeans.hpp"
+
 kmeans::kmeans(int k)
 {
     number_of_clusters = k;
@@ -36,9 +37,11 @@ void kmeans::train()
     while (used_indices->size() != train_data->size())
     {
         int idx = (rand() % (train_data->size()));
+        // int idx = 0; // to speed up the process  
         while (used_indices->find(idx) != used_indices->end())
         {
             idx = (rand() % (train_data->size()));
+            // idx++;
         }
         double min_dist = std::numeric_limits<double>::max();
         int best_cluster = -1;
@@ -111,3 +114,39 @@ double kmeans::test_performance()
     return 100.0 * (correct / (double)test_data->size());
 }
 
+int main()
+{
+    data_handler *dh = new data_handler();
+    dh->read_feature_vector("../Dataset/train-images-idx3-ubyte");
+    dh->read_label_vector("../Dataset/train-labels-idx1-ubyte");
+    dh->split_data();
+    dh->count_classes();
+    double performance = 0, best_performance = 0.0;
+    int best_k = 1;
+    for (int k = dh->get_num_classes(); k < dh->get_train_data()->size(); k++)
+    {
+        kmeans *km = new kmeans(k);
+        km->set_test_data(dh->get_test_data());
+        km->set_valid_data(dh->get_validation_data());
+        km->set_train_data(dh->get_train_data());
+        km->initialize_clusters_for_each_class();
+        km->train();
+        performance = km->validate_performance();
+        std::cout << "Current performance: " << performance << "%"
+                  << " at k = " << k << "\n";
+        if (performance > best_performance)
+        {
+            best_performance = performance;
+            best_k = k;
+        }
+    }
+    kmeans *km = new kmeans(best_k);
+    km->set_test_data(dh->get_test_data());
+    km->set_valid_data(dh->get_validation_data());
+    km->set_train_data(dh->get_train_data());
+    km->initialize_clusters_for_each_class();
+    km->test_performance();
+    performance = km->test_performance();
+    std::cout << "Best performance: " << performance << "%"
+              << " at k = " << best_k << "\n";
+}

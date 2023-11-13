@@ -66,7 +66,7 @@ typedef struct cluster
 
 } cluster_t;
 
-class kmeans : common_data
+class kmeans : public common_data
 {
     int number_of_clusters;
     std::vector<cluster_t *> *clusters;
