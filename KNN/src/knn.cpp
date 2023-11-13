@@ -125,7 +125,10 @@ double knn::calculateDistance(data *d1, data *d2)
 
     distance = sqrt(distance);
 #elif defined MANHATTAN
-// TODO: Implement Manhattan distance
+    for (unsigned i = 0; i < d1->get_feature_vector_size(); i++)
+    {
+        distance += std::abs(d1->get_feature_vector()->at(i) - d2->get_feature_vector()->at(i));
+    }
 #endif
     return distance;
 }
