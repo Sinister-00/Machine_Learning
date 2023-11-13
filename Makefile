@@ -6,8 +6,9 @@ LIB_DATA := libdata.so
 
 all: libdir objdir $(LIB_DATA)
 
-$(LIB_DATA): obj/data_handler.o obj/data.o
+$(LIB_DATA): obj/data_handler.o obj/data.o obj/common.o
 	$(CC) $(CFLAGS) -shared -o $(MLINCPP_ROOT)/lib/$(LIB_DATA) obj/*.o
+	# rm -r $(MLINCPP_ROOT)/obj
 
 libdir:
 	mkdir -p $(MLINCPP_ROOT)/lib
@@ -20,6 +21,9 @@ obj/data_handler.o: $(SRC_DIR)/data_handler.cpp
 
 obj/data.o: $(SRC_DIR)/data.cpp
 	$(CC) -fPIC $(CFLAGS) -o obj/data.o -I$(INCLUDE_DIR) -c $(SRC_DIR)/data.cpp
+
+obj/common.o: $(SRC_DIR)/common.cpp
+	$(CC) -fPIC $(CFLAGS) -o obj/common.o -I$(INCLUDE_DIR) -c $(SRC_DIR)/common.cpp
 
 clean:
 	rm -r $(MLINCPP_ROOT)/lib

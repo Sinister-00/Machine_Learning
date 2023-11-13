@@ -64,18 +64,6 @@ void knn::find_k_nearest_neighbors(data *d)
         }
     }
 }
-void knn::set_train_data(std::vector<data *> *v)
-{
-    train_data = v;
-}
-void knn::set_test_data(std::vector<data *> *v)
-{
-    test_data = v;
-}
-void knn::set_valid_data(std::vector<data *> *v)
-{
-    valid_data = v;
-}
 void knn::set_k(int k)
 {
     this->k = k;

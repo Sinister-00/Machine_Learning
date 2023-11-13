@@ -9,23 +9,17 @@
 #include <iostream>
 #include "data_handler.hpp"
 #include <data.hpp>
-
-class knn
+#include "common.hpp"
+class knn : public common_data
 {
     int k;
     std::vector<data *> *neighbors; // keep track of the k nearest neighbors
-    std::vector<data *> *train_data;
-    std::vector<data *> *test_data;
-    std::vector<data *> *valid_data;
 
 public:
     knn(int);
     knn();
     ~knn();
     void find_k_nearest_neighbors(data *d);
-    void set_train_data(std::vector<data *> *v);
-    void set_test_data(std::vector<data *> *v);
-    void set_valid_data(std::vector<data *> *v);
     void set_k(int); // set the value of k for kNN
     int prediction();
     double calculateDistance(data *d1, data *d2); // we will use Euclidean distance
