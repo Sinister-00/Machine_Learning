@@ -27,6 +27,7 @@ public:
     uint8_t get_label();                        // Get the class label
     uint8_t get_enum_label();                   // Get the enumerated label
     std::vector<uint8_t> *get_feature_vector(); // Get the feature vector
+    double get_distance();                      // Get the distance from test data point
 };
 
 #endif // __DATA_H__

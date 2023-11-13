@@ -1,5 +1,4 @@
 #include "knn.hpp"
-
 knn::knn(int value)
 {
     k = value;
@@ -11,6 +10,12 @@ knn::knn()
 knn::~knn()
 {
     // NA
+    delete_neighbors();
+}
+void knn::delete_neighbors()
+{
+    delete neighbors;    // Free up memory allocated for neighbors
+    neighbors = nullptr; // Set the pointer to nullptr after deletion
 }
 
 // complexity: O(n^2) if k = n
@@ -44,7 +49,8 @@ void knn::find_k_nearest_neighbors(data *d)
         {
             for (int j = 0; j < train_data->size(); j++)
             {
-                double distance = calculateDistance(d, train_data->at(j));
+                // double distance = calculateDistance(d, train_data->at(j));
+                double distance = train_data->at(j)->get_distance();
                 train_data->at(j)->set_distance(distance);
                 if (distance < min_distance && distance > prev_min_distance)
                 {
@@ -98,8 +104,9 @@ int knn::prediction()
             best = it.first;
         }
     }
-    delete neighbors; // Free up memory allocated for neighbors
-    return best;      // Return the class label with the highest frequency
+    // delete neighbors; // Free up memory allocated for neighbors //// handled by destructor
+    delete_neighbors();
+    return best; // Return the class label with the highest frequency
 }
 double knn::calculateDistance(data *d1, data *d2)
 {
@@ -109,10 +116,11 @@ double knn::calculateDistance(data *d1, data *d2)
         std::cout << "Error: Feature vector sizes do not match" << std::endl;
         return -1;
     }
-#ifdef EUCLIDEAN
+#ifdef EUCLID
     for (unsigned i = 0; i < d1->get_feature_vector_size(); i++)
     {
         distance += pow(d1->get_feature_vector()->at(i) - d2->get_feature_vector()->at(i), 2);
+        // std::cout << distance << std::endl;
     }
 
     distance = sqrt(distance);
@@ -130,6 +138,9 @@ double knn::validatePerformance()
     {
         find_k_nearest_neighbors(d);
         int prediction = this->prediction();
+        // printing d->get_label()
+        std::cout << prediction << "->" << (int)d->get_label() << std::endl;
+        // std::cout << "d->get_label(): " << (int)d->get_label() << std::endl;
         if (prediction == d->get_label())
         {
             count++;
@@ -157,4 +168,46 @@ double knn::testPerformance()
     }
     std::cout << "Test performance: " << std::fixed << std::setprecision(3) << (((double)count * 100) / (double)(test_data->size())) << "%" << std::endl;
     return (((double)count * 100) / (double)(test_data->size()));
+}
+
+double data::get_distance()
+{
+    return distance;
+}
+
+int main()
+{
+    data_handler *dh = new data_handler();
+    dh->read_feature_vector("../Dataset/train-images-idx3-ubyte");
+    dh->read_label_vector("../Dataset/train-labels-idx1-ubyte");
+    dh->split_data();
+    dh->count_classes();
+    knn *knn_model = new knn();
+    knn_model->set_train_data(dh->get_train_data());
+    knn_model->set_test_data(dh->get_test_data());
+    knn_model->set_valid_data(dh->get_validation_data());
+    knn_model->set_k(3);
+    double performance = 0, best_performance = 0.0;
+    int best_k = 0;
+    for (int i = 1; i <= 4; i++)
+    {
+        if (i == 1)
+        {
+            knn_model->set_k(i);
+            performance = knn_model->validatePerformance();
+            best_performance = performance;
+        }
+        else
+        {
+            knn_model->set_k(i);
+            performance = knn_model->validatePerformance();
+            if (performance > best_performance)
+            {
+                best_performance = performance;
+                best_k = i;
+            }
+        }
+    }
+    knn_model->set_k(best_k);
+    knn_model->testPerformance();
 }

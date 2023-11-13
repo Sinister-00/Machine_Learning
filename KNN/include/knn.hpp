@@ -2,6 +2,7 @@
 #define __KNN_H__
 #include <vector>
 #include <limits>
+#include <iomanip>
 #include <math.h>
 #include <cmath>
 #include <map>
@@ -30,6 +31,7 @@ public:
     double calculateDistance(data *d1, data *d2); // we will use Euclidean distance
     double validatePerformance();                 // pick the correct k value
     double testPerformance();                     // test the performance of the model on the test set
+    void delete_neighbors();
 };
 
 #endif // __KNN_H__

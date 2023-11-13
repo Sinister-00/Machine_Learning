@@ -183,13 +183,15 @@ std::vector<data *> *data_handler::get_validation_data()
 }
 
 // testing that the data handler works
-int main()
-{
-    data_handler *dh = new data_handler();
-    dh->read_feature_vector("Dataset/train-images-idx3-ubyte");
-    dh->read_label_vector("Dataset/train-labels-idx1-ubyte");
-    dh->split_data();
-    dh->count_classes();
-    std::cout << "Done\n";
-    return 0;
-}
+
+// run this command to compile: g++ -Wall -std=c++17 -I./include/ -o test ./src/*.cpp
+// int main()
+// {
+//     data_handler *dh = new data_handler();
+//     dh->read_feature_vector("Dataset/train-images-idx3-ubyte");
+//     dh->read_label_vector("Dataset/train-labels-idx1-ubyte");
+//     dh->split_data();
+//     dh->count_classes();
+//     std::cout << "Done\n";
+//     return 0;
+// }

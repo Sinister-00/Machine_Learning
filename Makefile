@@ -1,41 +1,26 @@
-
 CC := g++
-PATHR := Machine_Learning_in_Cpp
-INLCUDE_DIR := $(PATHR)/include
-SRC_DIR := $(PATHR)/src
+INCLUDE_DIR := $(MLINCPP_ROOT)/include
+SRC_DIR := $(MLINCPP_ROOT)/src
 CFLAGS := -std=c++11 -g
-LIBS_DATA := libdata.so
+LIB_DATA := libdata.so
 
-$(info PATHR=$(PATHR))
-$(info SRC_DIR=$(SRC_DIR))
+all: libdir objdir $(LIB_DATA)
 
-all: $(LIBS_DATA)
-
-$(LIBS_DATA): libdir objdir obj/data_handler.o obj/data.o
-	$(CC) $(CFLAGS) -o $(PATHR)/lib/$(LIBS_DATA) obj/*.o
-	rm -r $(PATHR)/obj
+$(LIB_DATA): obj/data_handler.o obj/data.o
+	$(CC) $(CFLAGS) -shared -o $(MLINCPP_ROOT)/lib/$(LIB_DATA) obj/*.o
 
 libdir:
-	mkdir -p lib
+	mkdir -p $(MLINCPP_ROOT)/lib
 
 objdir:
-	mkdir -p obj
+	mkdir -p $(MLINCPP_ROOT)/obj
 
 obj/data_handler.o: $(SRC_DIR)/data_handler.cpp
-	$(CC) -fPIC $(CFLAGS) -o obj/data_handler.o -I$(INLCUDE_DIR) -c $<
+	$(CC) -fPIC $(CFLAGS) -o obj/data_handler.o -I$(INCLUDE_DIR) -c $(SRC_DIR)/data_handler.cpp
 
 obj/data.o: $(SRC_DIR)/data.cpp
-	$(CC) -fPIC $(CFLAGS) -o obj/data.o -I$(INLCUDE_DIR) -c $<
+	$(CC) -fPIC $(CFLAGS) -o obj/data.o -I$(INCLUDE_DIR) -c $(SRC_DIR)/data.cpp
 
 clean:
-	rm -r lib
-	rm -r obj
-
-
-# in case of error:
-
-# g++ -c -fPIC -std=c++11 -I./include -o obj/data_handler.o ./src/data_handler.cpp
-
-# g++ -c -fPIC -std=c++11 -I./include -o obj/data.o ./src/data.cpp        
-
-# g++ -shared -o libdata.so obj/data_handler.o obj/data.o -fPIC
+	rm -r $(MLINCPP_ROOT)/lib
+	rm -r $(MLINCPP_ROOT)/obj
