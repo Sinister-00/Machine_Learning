@@ -47,6 +47,7 @@ typedef struct cluster
         {
             class_counts[val->get_label()]++;
         }
+        set_most_freq_class();
     }
     void set_most_freq_class()
     {
