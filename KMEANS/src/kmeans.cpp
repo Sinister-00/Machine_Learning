@@ -136,15 +136,70 @@ double kmeans::test_performance() // same as validate_performance() but for the 
 //     // delete used_indices; // delete the used indices
 // }
 
-int main() // driver code
+double kmeans::calculate_wcss()
 {
-    data_handler *dh = new data_handler();                                     // initialize the data handler
-    dh->read_feature_vector("../Dataset/train-images-idx3-ubyte");             // read the feature vector from the train images file
-    dh->read_label_vector("../Dataset/train-labels-idx1-ubyte");               // read the label vector from the train labels file
-    dh->split_data();                                                          // split the data into train, validation, and test data
-    dh->count_classes();                                                       // count the number of classes
-    double performance = 0, best_performance = 0.0;                            // initialize the performance variables
-    int best_k = 1;                                                            // assuming that the best k is 1
+    double wcss = 0.0;
+    for (int i = 0; i < clusters->size(); i++)
+    {
+        for (int j = 0; j < clusters->at(i)->cluster_points->size(); j++)
+        {
+            wcss += euclidean_distance(clusters->at(i)->centroid, clusters->at(i)->cluster_points->at(j));
+        }
+    }
+    return wcss;
+}
+
+// int main() // driver code
+// {
+//     data_handler *dh = new data_handler();                                     // initialize the data handler
+//     dh->read_feature_vector("../Dataset/train-images-idx3-ubyte");             // read the feature vector from the train images file
+//     dh->read_label_vector("../Dataset/train-labels-idx1-ubyte");               // read the label vector from the train labels file
+//     dh->split_data();                                                          // split the data into train, validation, and test data
+//     dh->count_classes();                                                       // count the number of classes
+//     double performance = 0, best_performance = 0.0;                            // initialize the performance variables
+//     int best_k = 1;                                                            // assuming that the best k is 1
+//     for (int k = dh->get_num_classes(); k < dh->get_train_data()->size(); k++) // starts from the number of classes and goes up to the number of data points
+//     {
+//         kmeans *km = new kmeans(k);                    // initialize the kmeans object
+//         km->set_test_data(dh->get_test_data());        // set the test data
+//         km->set_valid_data(dh->get_validation_data()); // set the validation data
+//         km->set_train_data(dh->get_train_data());      // set the train data
+//         km->initialize_clusters_for_each_class();      // initialize the clusters for each class
+//         km->train();                                   // train the model
+//         performance = km->validate_performance();      // get the performance on the validation data
+//         std::cout << "Current performance: " << performance << "%"
+//                   << " at k = " << k << "\n";
+//         if (performance > best_performance)
+//         {
+//             best_performance = performance;
+//             best_k = k;
+//         }
+//     }
+//     kmeans *km = new kmeans(best_k);
+//     km->set_test_data(dh->get_test_data());
+//     km->set_valid_data(dh->get_validation_data());
+//     km->set_train_data(dh->get_train_data());
+//     km->initialize_clusters_for_each_class();
+//     km->test_performance();
+//     performance = km->test_performance();
+//     std::cout << "Best performance: " << performance << "%"
+//               << " at k = " << best_k << "\n";
+// }
+
+// used WCSS to find the best k
+int main()
+{
+    data_handler *dh = new data_handler();                         // initialize the data handler
+    dh->read_feature_vector("../Dataset/train-images-idx3-ubyte"); // read the feature vector from the train images file
+    dh->read_label_vector("../Dataset/train-labels-idx1-ubyte");   // read the label vector from the train labels file
+    dh->split_data();                                              // split the data into train, validation, and test data
+    dh->count_classes();                                           // count the number of classes
+    double performance = 0, best_performance = 0.0;                // initialize the performance variables
+    int best_k = 1;                                                // assuming that the best k is 1
+
+    std::vector<double> wcss_values;            // to store the WCSS values
+    std::vector<double> validation_performance; // to store the validation performance values
+
     for (int k = dh->get_num_classes(); k < dh->get_train_data()->size(); k++) // starts from the number of classes and goes up to the number of data points
     {
         kmeans *km = new kmeans(k);                    // initialize the kmeans object
@@ -153,15 +208,23 @@ int main() // driver code
         km->set_train_data(dh->get_train_data());      // set the train data
         km->initialize_clusters_for_each_class();      // initialize the clusters for each class
         km->train();                                   // train the model
-        performance = km->validate_performance();      // get the performance on the validation data
-        std::cout << "Current performance: " << performance << "%"
-                  << " at k = " << k << "\n";
-        if (performance > best_performance)
+        double wcss = km->calculate_wcss();            // get the WCSS value for the current k
+        double val_perf = km->validate_performance();  // get the performance on the validation data
+        wcss_values.push_back(wcss);
+        validation_performance.push_back(val_perf);
+
+        std::cout << "For k = " << k << ": WCSS = " << wcss << ", Validation Performance = " << val_perf << "%\n";
+
+        if (wcss_values.size() > 1 && wcss_values[wcss_values.size() - 2] - wcss_values[wcss_values.size() - 1] < 0.01 &&
+            val_perf >= best_performance)
         {
-            best_performance = performance;
-            best_k = k;
+            // If the rate of decrease in WCSS is small and validation performance is better, update best_k and best_performance
+            best_k = k - 1;
+            best_performance = val_perf;
+            break; // break out of the loop
         }
     }
+
     kmeans *km = new kmeans(best_k);
     km->set_test_data(dh->get_test_data());
     km->set_valid_data(dh->get_validation_data());
@@ -171,4 +234,8 @@ int main() // driver code
     performance = km->test_performance();
     std::cout << "Best performance: " << performance << "%"
               << " at k = " << best_k << "\n";
+
+    delete dh;
+
+    return 0;
 }

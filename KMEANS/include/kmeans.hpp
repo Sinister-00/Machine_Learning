@@ -82,6 +82,7 @@ public:
     double manhattan_distance(std::vector<double> *, data *);
     double validate_performance();
     double test_performance();
+    double calculate_wcss();
 };
 
 #endif // __KMEANS_HPP__
