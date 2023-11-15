@@ -30,4 +30,4 @@ clean:
 	rm -r $(MLINCPP_ROOT)/obj
 # before running make
 # use this command to export the MLINCPP_ROOT
-# export MLINCPP_ROOT=/home/username/MLinCpp
+# export MLINCPP_ROOT=$PWD

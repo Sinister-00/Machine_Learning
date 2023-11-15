@@ -15,6 +15,42 @@ data_handler::~data_handler()
     delete validation_data;
 }
 
+void data_handler::read_data_from_csv(std::string path, std::string delimiter)
+{
+    // also well count classes here;
+    // general function supposed to be;
+    num_classes = 0;
+    std::ifstream data_file(path.c_str());
+    std::string line; // stores each line of the csv file
+    while (getline(data_file, line))
+    {
+        if (line.length() == 0)
+            continue;
+        data *d = new data();
+        d->set_feature_vector(new std::vector<double>());
+        size_t pos = 0;
+        std::string token; // stores the value in between each delimiter
+        while (pos == line.find(delimiter) != std::string::npos)
+        {
+            token = line.substr(0, pos);                // from 0 to the position of the delimiter not including the delimiter
+            d->append_feature_vector(std::stod(token)); // convert the string to a double and append it to the feature vector
+            line.erase(0, pos + delimiter.length());    // remove first token and shorten the array
+        }
+        if (classMap.find(line) == classMap.end())
+        {
+            d->set_label(classMap[line]);
+        }
+        else
+        {
+            classMap[line] = num_classes;
+            d->set_label(num_classes);
+            num_classes++;
+        }
+        data_array->push_back(d);
+    }
+    feature_vector_size = data_array->at(0)->get_feature_vector_double()->size();
+}
+
 void data_handler::read_feature_vector(std::string path)
 {
     uint32_t header[4]; // Magic number, number of images, number of rows, number of columns
@@ -160,6 +196,10 @@ void data_handler::count_classes()
         }
     }
     num_classes = count;
+    for (data *data : *data_array)
+    {
+        data->set_class_vector(num_classes);
+    }
     std::cout << "Successfully counted number of classes: " << num_classes << std::endl;
 }
 
@@ -170,7 +210,8 @@ uint32_t data_handler::convert_to_little_endian(const unsigned char *bytes)
     return (uint32_t)((bytes[0] << 24) | (bytes[1] << 16) | (bytes[2] << 8) | (bytes[3]));
 }
 
-int data_handler::get_num_classes(){
+int data_handler::get_num_classes()
+{
     return num_classes;
 }
 
