@@ -203,6 +203,51 @@ void data_handler::count_classes()
     std::cout << "Successfully counted number of classes: " << num_classes << std::endl;
 }
 
+void data_handler::normalize_data()
+{
+    std::vector<double> mins, maxs;
+    data *d = data_array->at(0);
+    for (auto val : *d->get_feature_vector())
+    {
+        mins.push_back(val);
+        maxs.push_back(val);
+    }
+    for (int i = 1; i < data_array->size(); i++)
+    {
+        d = data_array->at(i);
+        for (int j = 0; j < d->get_feature_vector_size(); j++)
+        {
+            double val = (double)d->get_feature_vector()->at(j);
+            if (val < mins.at(j))
+            {
+                mins[j] = val;
+            }
+            if (val > maxs.at(j))
+            {
+                maxs[j] = val;
+            }
+        }
+    }
+
+    // normalize
+    for (int i = 0; i < data_array->size(); i++)
+    {
+        data_array->at(i)->set_normalised_feature_vector(new std::vector<double>());
+        data_array->at(i)->set_class_vector(num_classes);
+        for (int j = 0; j < data_array->at(i)->get_feature_vector_size(); j++)
+        {
+            if (maxs[j] - mins[j] == 0)
+            {
+                data_array->at(i)->append_feature_vector(0.0);
+            }
+            else
+            {
+                data_array->at(i)->append_feature_vector((double)(data_array->at(i)->get_feature_vector()->at(j) - mins[j]) / (maxs[j] - mins[j]));
+            }
+        }
+    }
+}
+
 uint32_t data_handler::convert_to_little_endian(const unsigned char *bytes)
 {
     // from stack overflow

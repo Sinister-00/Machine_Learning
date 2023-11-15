@@ -1,3 +1,5 @@
+#ifndef __DATA_HANDLER_H__
+#define __DATA_HANDLER_H__
 #include <fstream>
 #include <stdint.h> // for uint8_t
 #include "data.hpp"
@@ -5,8 +7,6 @@
 #include <string>
 #include <map>           // map a class label to the enum value
 #include <unordered_set> // for track of indexes as we split the data
-#ifndef __DATA_HANDLER_H__
-#define __DATA_HANDLER_H__
 
 class data_handler
 {
@@ -36,6 +36,8 @@ public:
     void read_label_vector(std::string path);                         // Read label vector from file
     void split_data();                                                // Split data into train, test, and validation
     void count_classes();                                             // Count the number of unique classes
+
+    void normalize_data(); // Normalize data
 
     // Utility function for little-endian conversion
     uint32_t convert_to_little_endian(const unsigned char *bytes); // Convert number to little endian

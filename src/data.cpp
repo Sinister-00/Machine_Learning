@@ -8,6 +8,10 @@ void data::set_feature_vector(std::vector<double> *vect)
 {
     feature_vector_double = vect;
 }
+void data::set_normalised_feature_vector(std::vector<double> *vect)
+{
+    normalised_feature_vector = vect;
+}
 void data::append_feature_vector(uint8_t val)
 {
     feature_vector->push_back(val);
@@ -62,6 +66,10 @@ std::vector<double> *data::get_feature_vector_double()
 {
     return feature_vector_double;
 }
+std::vector<double> *data::get_normalised_feature_vector()
+{
+    return normalised_feature_vector;
+}
 std::vector<int> *data::get_class_vector()
 {
     return class_vector;
@@ -78,4 +86,22 @@ data::~data()
 void data::set_distance(double val)
 {
     distance = val;
+}
+
+void data::print_vector()
+{
+    for (int i = 0; i < feature_vector->size(); i++)
+    {
+        std::cout << (int)feature_vector->at(i) << " ";
+    }
+    std::cout << std::endl;
+}
+
+void data::print_normalised_vector()
+{
+    for (int i = 0; i < normalised_feature_vector->size(); i++)
+    {
+        std::cout << normalised_feature_vector->at(i) << " ";
+    }
+    std::cout << std::endl;
 }
