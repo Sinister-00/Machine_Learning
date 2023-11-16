@@ -183,6 +183,28 @@ void Network::validate()
     std::cout << "validation performance: " << correct / cnt << std::endl;
 }
 
-int main(){
-    
+int main()
+{
+    data_handler *dh = new data_handler();
+#ifdef MLINX
+
+    dh->read_feature_vector("Dataset/train-images-idx3-ubyte");
+    dh->read_label_vector("Dataset/train-labels-idx1-ubyte");
+
+#else
+    dh->read_data_from_csv("../Dataset/iris.csv", ",");
+#endif
+    dh->split_data();
+    std::vector<int> hidden_layers = {10};
+    auto lambda = [&]()
+    {
+        Network *net = new Network(hidden_layers, dh->get_train_data()->at(0)->get_normalised_feature_vector()->size(), dh->get_num_classes(), 0.1);
+        net->set_train_data(dh->get_train_data());
+        net->set_test_data(dh->get_test_data());
+        net->set_valid_data(dh->get_validation_data());
+        net->train(17);
+        net->validate();
+        std::cout << "test performance: " << net->test() << std::endl;
+    };
+    lambda();
 }
