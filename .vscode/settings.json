@@ -1,6 +1,10 @@
 {
   "files.associations": {
     "unordered_set": "cpp",
-    "vector": "cpp"
-  }
+    "vector": "cpp",
+    "array": "cpp",
+    "string": "cpp",
+    "string_view": "cpp"
+  },
+  "C_Cpp.dimInactiveRegions": false
 }

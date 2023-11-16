@@ -1,7 +1,7 @@
 CC := g++
 SRC := $(MLINCPP_ROOT)/KMEANS/src
 CFLAGS := -std=c++11
-INCLUDE := $(MLINCPP_ROOT)/KNN/include/
+INCLUDE := $(PWD)/include/*
 
 all: main
 
