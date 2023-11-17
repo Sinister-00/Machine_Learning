@@ -13,81 +13,102 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v2
+      - name: Checkout code
+        uses: actions/checkout@v2
 
-    - name: Use Node.js 16
-      uses: actions/setup-node@v3
-      with:
-        node-version: '16'
+      - name: Use Node.js 16
+        uses: actions/setup-node@v3
+        with:
+          node-version: "16"
 
-    - name: Install dependencies
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y g++
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y g++
 
-    - name: Compile
-      run: |
-        set -e
-        g++ -std=c++11 -g -fPIC -I./include -c ./src/data_handler.cpp -o ./obj/data_handler.o > build.log 2>&1
-        g++ -std=c++11 -g -fPIC -I./include -c ./src/data.cpp -o ./obj/data.o >> build.log 2>&1
-        g++ -std=c++11 -g -fPIC -I./include -c ./src/common.cpp -o ./obj/common.o >> build.log 2>&1
-        g++ -std=c++11 -g -shared -o ./lib/libdata.so ./obj/*.o >> build.log 2>&1
-        g++ -std=c++11 -DEUCLID ./KNN/src/knn.cpp -o ./KNN/Euclidian_main -I./KNN/include -I./include -L./lib -ldata >> build.log 2>&1
-        g++ -std=c++11 -DMANHATTAN ./KNN/src/knn.cpp -o ./KNN/Manhattan_main -I./KNN/include -I./include -L./lib -ldata >> build.log 2>&1
-        g++ -std=c++11 ./KMEANS/src/kmeans.cpp -o ./KMEANS/main -I./KMEANS/include -I./include -L./lib -ldata >> build.log 2>&1
+      - name: Create obj and lib folders if not exist
+        run: |
+          mkdir -p obj lib
+          mkdir -p ./NEURAL_NETWORK/obj  # Create obj folder inside NEURAL_NETWORK if not exists
 
-    - name: Display Warnings
-      run: cat build.log
+      - name: Compile
+        run: |
+          set -e
+          g++ -std=c++11 -g -fPIC -I./include -c ./src/data_handler.cpp -o ./obj/data_handler.o > build.log 2>&1
+          g++ -std=c++11 -g -fPIC -I./include -c ./src/data.cpp -o ./obj/data.o >> build.log 2>&1
+          g++ -std=c++11 -g -fPIC -I./include -c ./src/common.cpp -o ./obj/common.o >> build.log 2>&1
+          g++ -std=c++11 -g -shared -o ./lib/libdata.so ./obj/*.o >> build.log 2>&1
+          g++ -std=c++11 -DEUCLID ./KNN/src/knn.cpp -o ./KNN/Euclidean_main -I./KNN/include -I./include -L./lib -ldata >> build.log 2>&1
+          g++ -std=c++11 -DMANHATTAN ./KNN/src/knn.cpp -o ./KNN/Manhattan_main -I./KNN/include -I./include -L./lib -ldata >> build.log 2>&1
+          g++ -std=c++11 ./KMEANS/src/kmeans.cpp -o ./KMEANS/main -I./KMEANS/include -I./include -L./lib -ldata >> build.log 2>&1
+          g++ -c -std=c++11 -g ./NEURAL_NETWORK/src/layer.cpp -o ./NEURAL_NETWORK/obj/layer.o -I./NEURAL_NETWORK/include/ -I./include > build.log 2>&1 
+          g++ -c -std=c++11 -g ./NEURAL_NETWORK/src/neuron.cpp -o ./NEURAL_NETWORK/obj/neuron.o -I./NEURAL_NETWORK/include/ -I./include >> build.log 2>&1
+          g++ -std=c++11 -g ./NEURAL_NETWORK/src/network.cpp -o ./NEURAL_NETWORK/main -L./lib/ -I./NEURAL_NETWORK/include/ -I./include -ldata ./NEURAL_NETWORK/obj/*.o >> build.log 2>&1 
+          g++ -std=c++11 -g -DMLINX ./NEURAL_NETWORK/src/network.cpp -o ./NEURAL_NETWORK/main_2 -L./lib/ -I./NEURAL_NETWORK/include/ -I./include -ldata ./NEURAL_NETWORK/obj/*.o >> build.log 2>&1
 
-    - name: Check for Warnings
-      run: |
-        if grep -q 'warning:' build.log; then
-          echo "Build failed due to warnings."
-          exit 1
-        fi
-    - name: Create and Run Test to check data handling
-      run: |
-        echo "#include <iostream>" > ./src/test.cpp
-        echo "#include \"../include/data_handler.hpp\"" >> ./src/test.cpp
-        echo "" >> ./src/test.cpp
-        echo "int main() {" >> ./src/test.cpp
-        echo "    data_handler *dh = new data_handler();" >> ./src/test.cpp
-        echo "    dh->read_feature_vector(\"Dataset/train-images-idx3-ubyte\");" >> ./src/test.cpp
-        echo "    dh->read_label_vector(\"Dataset/train-labels-idx1-ubyte\");" >> ./src/test.cpp
-        echo "    dh->split_data();" >> ./src/test.cpp
-        echo "    dh->count_classes();" >> ./src/test.cpp
-        echo "    std::cout << \"Done\" << std::endl;" >> ./src/test.cpp
-        echo "    delete dh;" >> ./src/test.cpp
-        echo "    return 0;}" >> ./src/test.cpp
-        g++ -std=c++11 -o ./src/test ./src/test.cpp ./src/data_handler.cpp ./src/data.cpp -I./include
-        ./src/test
-        
+      # - name: Display Warnings
+      #   run: cat build.log
 
-    - name: Test KMEANS
-      run: |
-        cd KMEANS
-        export LD_LIBRARY_PATH=../lib
-        ./main
+      - name: Check for Warnings
+        run: |
+          if grep -q 'warning:' build.log; then
+            echo "Build failed due to warnings."
+            exit 1
+          fi
+      - name: Create and Run Test to check data handling
+        run: |
+          echo "#include <iostream>" > ./src/test.cpp
+          echo "#include \"../include/data_handler.hpp\"" >> ./src/test.cpp
+          echo "" >> ./src/test.cpp
+          echo "int main() {" >> ./src/test.cpp
+          echo "    DataHandler *dh = new DataHandler();" >> ./src/test.cpp
+          echo "    dh->read_feature_vector(\"Dataset/train-images-idx3-ubyte\");" >> ./src/test.cpp
+          echo "    dh->read_label_vector(\"Dataset/train-labels-idx1-ubyte\");" >> ./src/test.cpp
+          echo "    dh->split_data();" >> ./src/test.cpp
+          echo "    dh->count_classes();" >> ./src/test.cpp
+          echo "    std::cout << \"Done\" << std::endl;" >> ./src/test.cpp
+          echo "    delete dh;" >> ./src/test.cpp
+          echo "    return 0;}" >> ./src/test.cpp
+          g++ -std=c++11 -o ./src/test ./src/test.cpp ./src/data_handler.cpp ./src/data.cpp -I./include
+          ./src/test
 
-    - name: Test KNN (Euclidean)
-      run: |
-        cd KNN
-        export LD_LIBRARY_PATH=../lib
-        timeout 20s ./Euclidian_main || echo "KNN (Euclidean) test passed"
+      - name: Test KMEANS
+        run: |
+          cd KMEANS
+          export LD_LIBRARY_PATH=../lib
+          ./main
 
-    - name: Test KNN (Manhattan)
-      run: |
-        cd KNN
-        export LD_LIBRARY_PATH=../lib
-        timeout 20s ./Manhattan_main || echo "KNN (Manhattan) test passed"
+      - name: Test KNN (Euclidean)
+        run: |
+          cd KNN
+          export LD_LIBRARY_PATH=../lib
+          timeout 20s ./Euclidean_main || echo "KNN (Euclidean) test passed"
 
+      - name: Test KNN (Manhattan)
+        run: |
+          cd KNN
+          export LD_LIBRARY_PATH=../lib
+          timeout 20s ./Manhattan_main || echo "KNN (Manhattan) test passed"
 
-    - name: Clean up
-      run: |
-        rm -rf ./obj/*.o
-        rm -rf ./lib/*.so
-        rm -rf ./KNN/Euclidian_main
-        rm -rf ./KNN/Manhattan_main
-        rm -rf ./KMEANS/main
-        rm ./src/test ./src/test.cpp
+      - name: Test-1 NEURAL_NETWORK
+        run: |
+          cd NEURAL_NETWORK
+          export LD_LIBRARY_PATH=../lib
+          ./main
+      - name: Test-2 NEURAL_NETWORK
+        run: |
+          cd NEURAL_NETWORK
+          export LD_LIBRARY_PATH=../lib
+          ./main_2
+
+      - name: Clean up
+        run: |
+          rm -rf ./obj/*.o
+          rm -rf ./lib/*.so
+          rm -rf ./KNN/Euclidian_main
+          rm -rf ./KNN/Manhattan_main
+          rm -rf ./KMEANS/main
+          rm -rf ./NEURAL_NETWORK/main
+          rm -rf ./NEURAL_NETWORK/main_2
+          rm -rf ./NEURAL_NETWORK/obj/*.o
+          rm ./src/test ./src/test.cpp
