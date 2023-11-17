@@ -12,13 +12,13 @@
 typedef struct cluster // cluster struct
 {
     std::vector<double> *centroid;       // centroid of the cluster
-    std::vector<data *> *cluster_points; // data points in the cluster
+    std::vector<Data *> *cluster_points; // data points in the cluster
     std::map<int, int> class_counts;     // class counts in the cluster (class, count)
     int most_freq_class;                 // most frequent class in the cluster
-    cluster(data *d)                     // constructor for the cluster struct that takes a data point
+    cluster(Data *d)                     // constructor for the cluster struct that takes a data point
     {
         centroid = new std::vector<double>;       // initialize the centroid vector
-        cluster_points = new std::vector<data *>; // initialize the cluster points vector
+        cluster_points = new std::vector<Data *>; // initialize the cluster points vector
         for (auto v : *(d->get_feature_vector())) // for each value in the data point's feature vector
         {
             centroid->push_back(v); // initialize the centroid to the first data point
@@ -27,7 +27,7 @@ typedef struct cluster // cluster struct
         class_counts[d->get_label()] = 1; // initialize the class counts to the first data point
         most_freq_class = d->get_label();
     }
-    void add_to_cluster(data *val) // add a data point to the cluster
+    void add_to_cluster(Data *val) // add a data point to the cluster
     {
         int prevSize = cluster_points->size(); // get the previous size of the cluster
         cluster_points->push_back(val);        // push back the data point to the cluster points vector
@@ -66,7 +66,7 @@ typedef struct cluster // cluster struct
 
 } cluster_t; // cluster type
 
-class kmeans : public common_data
+class kmeans : public CommonData
 {
     int number_of_clusters;
     std::vector<cluster_t *> *clusters;
@@ -78,8 +78,8 @@ public:
     void initialize_clusters();
     void initialize_clusters_for_each_class();
     void train();
-    double euclidean_distance(std::vector<double> *, data *);
-    double manhattan_distance(std::vector<double> *, data *);
+    double euclidean_distance(std::vector<double> *, Data *);
+    double manhattan_distance(std::vector<double> *, Data *);
     double validate_performance();
     double test_performance();
     double calculate_wcss();

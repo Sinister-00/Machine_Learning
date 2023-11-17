@@ -59,7 +59,7 @@ void kmeans::train()
         used_indices->insert(idx);                                       // add the index to the used indices
     }
 }
-double kmeans::euclidean_distance(std::vector<double> *centeroid, data *d)
+double kmeans::euclidean_distance(std::vector<double> *centeroid, Data *d)
 {
     double dist = 0.0;                          // initialize the distance to 0
     for (int i = 0; i < centeroid->size(); i++) // for each value in the centroid
@@ -69,7 +69,7 @@ double kmeans::euclidean_distance(std::vector<double> *centeroid, data *d)
     return sqrt(dist); // return the square root of the distance
 }
 
-double kmeans::manhattan_distance(std::vector<double> *centeroid, data *d)
+double kmeans::manhattan_distance(std::vector<double> *centeroid, Data *d)
 {
     double dist = 0.0;                          // initialize the distance to 0
     for (int i = 0; i < centeroid->size(); i++) // for each value in the centroid
@@ -189,7 +189,7 @@ double kmeans::calculate_wcss()
 // used WCSS to find the best k
 int main()
 {
-    data_handler *dh = new data_handler();                         // initialize the data handler
+    DataHandler *dh = new DataHandler();                           // initialize the data handler
     dh->read_feature_vector("../Dataset/train-images-idx3-ubyte"); // read the feature vector from the train images file
     dh->read_label_vector("../Dataset/train-labels-idx1-ubyte");   // read the label vector from the train labels file
     dh->split_data();                                              // split the data into train, validation, and test data

@@ -21,9 +21,9 @@ void knn::delete_neighbors()
 // complexity: O(n^2) if k = n
 // if k=2, then O(~n)
 //
-void knn::find_k_nearest_neighbors(data *d)
+void knn::find_k_nearest_neighbors(Data *d)
 {
-    neighbors = new std::vector<data *>;
+    neighbors = new std::vector<Data *>;
     double min_distance = std::numeric_limits<double>::max(); // Set min_distance to max double value to ensure first distance is less than min_distance
     double prev_min_distance = min_distance;                  // Set prev_min_distance to max double value to ensure first distance is less than prev_min_distance
     int idx = 0;
@@ -96,7 +96,7 @@ int knn::prediction()
     delete_neighbors();
     return best; // Return the class label with the highest frequency
 }
-double knn::calculateDistance(data *d1, data *d2)
+double knn::calculateDistance(Data *d1, Data *d2)
 {
     double distance = 0.0;
     if (d1->get_feature_vector_size() != d2->get_feature_vector_size())
@@ -125,7 +125,7 @@ double knn::validatePerformance()
 {
     double currenr = 0.0;
     int count = 0, idx = 0;
-    for (data *d : *valid_data)
+    for (Data *d : *valid_data)
     {
         find_k_nearest_neighbors(d);
         int prediction = this->prediction();
@@ -148,7 +148,7 @@ double knn::testPerformance()
 {
     double currenr = 0.0;
     int count = 0, idx = 0;
-    for (data *d : *test_data)
+    for (Data *d : *test_data)
     {
         find_k_nearest_neighbors(d);
         int prediction = this->prediction();
@@ -161,14 +161,14 @@ double knn::testPerformance()
     return (((double)count * 100) / (double)(test_data->size()));
 }
 
-double data::get_distance()
+double Data::get_distance()
 {
     return distance;
 }
 
 int main()
 {
-    data_handler *dh = new data_handler();
+    DataHandler *dh = new DataHandler();
     dh->read_feature_vector("../Dataset/train-images-idx3-ubyte");
     dh->read_label_vector("../Dataset/train-labels-idx1-ubyte");
     dh->split_data();
