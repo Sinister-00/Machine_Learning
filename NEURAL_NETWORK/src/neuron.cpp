@@ -3,10 +3,8 @@
 
 double generateRandomNumber(double min, double max)
 {
-    double random = ((double)rand()) / (double)RAND_MAX;
-    double diff = max - min;
-    double r = random * diff;
-    return min + r;
+    double random = ((double)rand()) / RAND_MAX;
+    return min + random * (max - min);
 }
 Neuron::Neuron(int prevLayerSize, int currentLayerSize)
 {

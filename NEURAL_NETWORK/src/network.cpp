@@ -19,10 +19,10 @@ Network::Network(std::vector<int> spec, int input_size, int classNum, double lea
 
 Network::~Network()
 {
-    for (int i = 0; i < layers.size(); i++)
-    {
-        delete layers.at(i);
-    }
+    // for (int i = 0; i < layers.size(); i++)
+    // {
+    //     delete layers.at(i);
+    // }
 }
 
 double Network::activate(std::vector<double> weights, std::vector<double> inputs)
@@ -30,7 +30,7 @@ double Network::activate(std::vector<double> weights, std::vector<double> inputs
     double activation = weights.back();
     for (int i = 0; i < inputs.size() - 1; i++)
     {
-        activation += weights.at(i) * inputs.at(i);
+        activation += weights[i] * inputs.at(i);
     }
     return activation;
 }
@@ -45,7 +45,7 @@ double Network::transfer_derivative(double output)
     return output * (1.0 - output);
 }
 
-std::vector<double> Network::fprop(data *d)
+std::vector<double> Network::fprop(Data *d)
 {
     std::vector<double> inputs = *d->get_normalised_feature_vector();
     for (int i = 0; i < layers.size(); i++)
@@ -64,9 +64,9 @@ std::vector<double> Network::fprop(data *d)
     return inputs; // output layer outputs
 }
 
-void Network::bprop(data *d)
+void Network::bprop(Data *d)
 {
-    for (int i = layers.size() - 1; i >= 0; i++)
+    for (int i = layers.size() - 1; i >= 0; i--)
     {
         Layer *layer = layers.at(i);
         std::vector<double> errs;
@@ -87,7 +87,7 @@ void Network::bprop(data *d)
             for (int j = 0; j < layer->neurons.size(); j++)
             {
                 Neuron *neuron = layer->neurons.at(j);
-                errs.push_back((double)d->get_class_vector()->at(j) - neuron->output); // expected - actual
+                errs.push_back((double)d->get_class_vector().at(j) - neuron->output);
             }
         }
         for (int j = 0; j < layer->neurons.size(); j++)
@@ -98,7 +98,7 @@ void Network::bprop(data *d)
     }
 }
 
-void Network::update_weights(data *d)
+void Network::update_weights(Data *d)
 {
     std::vector<double> inputs = *d->get_normalised_feature_vector();
     for (int i = 0; i < layers.size(); i++)
@@ -122,7 +122,7 @@ void Network::update_weights(data *d)
     }
 }
 
-int Network::predict(data *d)
+int Network::predict(Data *d)
 {
     std::vector<double> outputs = this->fprop(d);
     return std::distance(outputs.begin(), std::max_element(outputs.begin(), outputs.end()));
@@ -133,12 +133,12 @@ void Network::train(int epochs)
     for (int i = 0; i < epochs; i++)
     {
         double sum_error = 0.0;
-        for (data *d : *this->train_data)
+        for (Data *d : *this->train_data)
         {
             std::vector<double> outputs = this->fprop(d);
-            std::vector<int> expected = *d->get_class_vector();
+            std::vector<int> expected = d->get_class_vector();
             double temp_err = 0.0;
-            for (int j = 0; j < expected.size(); j++)
+            for (int j = 0; j < outputs.size(); j++)
             {
                 temp_err += pow(expected.at(j) - outputs.at(j), 2);
             }
@@ -154,11 +154,11 @@ double Network::test()
 {
     double correct = 0.0;
     double cnt = 0.0;
-    for (data *d : *this->test_data)
+    for (Data *d : *this->test_data)
     {
         cnt++;
-        int prediction = this->predict(d);
-        if (d->get_class_vector()->at(prediction) == 1)
+        int prediction = predict(d);
+        if (d->get_class_vector().at(prediction) == 1)
         {
             correct++;
         }
@@ -171,11 +171,11 @@ void Network::validate()
 {
     double correct = 0.0;
     double cnt = 0.0;
-    for (data *d : *this->valid_data)
+    for (Data *d : *this->valid_data)
     {
         cnt++;
-        int prediction = this->predict(d);
-        if (d->get_class_vector()->at(prediction) == 1)
+        int prediction = predict(d);
+        if (d->get_class_vector().at(prediction) == 1)
         {
             correct++;
         }
@@ -185,20 +185,24 @@ void Network::validate()
 
 int main()
 {
-    data_handler *dh = new data_handler();
+    DataHandler *dh = new DataHandler();
+
 #ifdef MLINX
 
-    dh->read_feature_vector("Dataset/train-images-idx3-ubyte");
-    dh->read_label_vector("Dataset/train-labels-idx1-ubyte");
+    dh->read_input_data("../Dataset/train-images-idx3-ubyte");
+    // std::cout << "reading labels..." << std::endl;
+    dh->read_label_data("../Dataset/train-labels-idx1-ubyte");
+    dh->count_classes();
 
 #else
-    dh->read_data_from_csv("../Dataset/iris.csv", ",");
+    dh->read_data_from_csv("../Dataset/iris.data", ",");
 #endif
+    std::cout << "splitting data..." << std::endl;
     dh->split_data();
     std::vector<int> hidden_layers = {10};
     auto lambda = [&]()
     {
-        Network *net = new Network(hidden_layers, dh->get_train_data()->at(0)->get_normalised_feature_vector()->size(), dh->get_num_classes(), 0.1);
+        Network *net = new Network(hidden_layers, dh->get_train_data()->at(0)->get_normalised_feature_vector()->size(), dh->get_num_classes(), 0.25);
         net->set_train_data(dh->get_train_data());
         net->set_test_data(dh->get_test_data());
         net->set_valid_data(dh->get_validation_data());
