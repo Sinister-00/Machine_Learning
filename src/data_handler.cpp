@@ -99,9 +99,10 @@ void DataHandler::read_input_data(std::string path)
         std::cout << "number of rows: " << num_rows << "\n";
         std::cout << "number of cols: " << num_cols << "\n";
         std::cout << "Done getting input file header" << std::endl;
-        int img_size = num_rows * num_cols;
-        for (int i = 0; i < (int)num_images; i++)
+        uint32_t img_size = num_rows * num_cols;
+        for (i = 0; i < num_images; i++)
         {
+            // std::cout << "inside the for loop\n";
             Data *d = new Data();
             d->set_feature_vector(new std::vector<uint8_t>());
             uint8_t elem[1];
@@ -120,6 +121,7 @@ void DataHandler::read_input_data(std::string path)
             data_array->push_back(d);
             data_array->back()->set_class_vector(num_classes);
         }
+        // std::cout << "Outside the loop\n";
         normalize_data();
         feature_vector_size = data_array->at(0)->get_feature_vector()->size();
         std::cout << "Successfully read " << data_array->size() << " data entries.\n";
@@ -134,9 +136,10 @@ void DataHandler::read_input_data(std::string path)
 
 void DataHandler::read_label_data(std::string path)
 {
-    uint32_t magic = 0, num_images = 0, num_rows = 0, num_cols = 0;
+    // std::cout << "I'm inside read label data\n";
+    uint32_t magic = 0, num_images = 0;
     unsigned char bytes[4];
-    FILE *fp = fopen(path.c_str(), "rb");
+    FILE *fp = fopen(path.c_str(), "r");
     if (fp)
     {
         int i = 0;
@@ -164,11 +167,9 @@ void DataHandler::read_label_data(std::string path)
         }
         std::cout << "number of images: " << num_images << "\n";
         std::cout << "Magic: " << magic << "\n";
-        std::cout << "number of rows: " << num_rows << "\n";
-        std::cout << "number of cols: " << num_cols << "\n";
 
         std::cout << "Done getting label file header" << std::endl;
-        for (int j = 0; j < (int)num_images; j++)
+        for (unsigned j = 0; j < num_images; j++)
         {
             uint8_t elem[1];
             if (fread(elem, sizeof(elem), 1, fp))
@@ -387,7 +388,7 @@ void DataHandler::normalize_data()
         mins.push_back(val);
         maxs.push_back(val);
     }
-    int size = d->get_feature_vector_size();
+    int size = data_array->size();
     for (int i = 1; i < size; i++)
     {
         d = data_array->at(i);
@@ -406,7 +407,7 @@ void DataHandler::normalize_data()
     }
 
     // normalize
-    size = d->get_feature_vector_size();
+    size = data_array->size();
     for (int i = 0; i < size; i++)
     {
         data_array->at(i)->set_normalised_feature_vector(new std::vector<double>());
@@ -415,11 +416,11 @@ void DataHandler::normalize_data()
         {
             if (maxs[j] - mins[j] == 0)
             {
-                data_array->at(i)->append_feature_vector(0.0);
+                data_array->at(i)->append_normalised_feature_vector(0.0);
             }
             else
             {
-                data_array->at(i)->append_feature_vector((double)(data_array->at(i)->get_feature_vector()->at(j) - mins[j]) / (maxs[j] - mins[j]));
+                data_array->at(i)->append_normalised_feature_vector((double)(data_array->at(i)->get_feature_vector()->at(j) - mins[j]) / (maxs[j] - mins[j]));
             }
         }
     }
