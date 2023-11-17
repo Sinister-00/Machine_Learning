@@ -112,3 +112,6 @@ jobs:
           rm -rf ./NEURAL_NETWORK/main_2
           rm -rf ./NEURAL_NETWORK/obj/*.o
           rm ./src/test ./src/test.cpp
+
+
+          
